@@ -7,12 +7,15 @@ export {
   FONTS,
   GRADIENTS,
   MOMENT_LAYOUTS,
+  PALETTES,
   PROFILE_STYLES,
+  RABISCO_KINDS,
+  DOODLE_KINDS,
   STICKER_CATEGORIES,
   STICKER_KINDS,
   TEXTURES,
 } from "./catalog";
-export type { AvatarFrame, Corners, FontChoice, GradientId, MomentsLayout, ProfileStyle, StickerKind, TextureId } from "./catalog";
+export type { AvatarFrame, Corners, FontChoice, GradientId, MomentsLayout, DoodleKind, ProfileStyle, RabiscoKind, StickerKind, TextureId } from "./catalog";
 export { contrastRatio, ensureReadable, isHexColor, mix, readableTextOn, themeColors } from "./color";
 export type { ThemeColors } from "./color";
 export { seedDemoAppearances } from "./demo";

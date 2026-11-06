@@ -169,6 +169,7 @@ export function sanitizeAppearance(value: unknown): ProfileAppearance {
   if (!isRecord(value)) return defaultAppearance();
   const pick = <T extends string>(list: readonly T[], item: unknown): T | null => (isOneOf(list, item) ? item : null);
   return {
+    // Os modelos que saíram (Y2K, glitch…) viram clássico, mantendo as escolhas da pessoa
     style: isOneOf(PROFILE_STYLES, value.style) ? value.style : "classico",
     cover: sanitizeCover(value.cover),
     palette: sanitizePalette(value.palette),

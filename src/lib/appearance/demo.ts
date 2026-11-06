@@ -4,21 +4,31 @@ import { addSticker, chooseStyle, defaultAppearance } from "./model";
 import { loadAppearance, saveAppearance } from "./storage";
 import type { ProfileAppearance } from "./types";
 
-// MODO DEMONSTRAÇÃO: cada perfil de exemplo com um estilo, para mostrar como dois perfis podem
-// ser completamente diferentes. Nunca sobrescreve o que já foi salvo.
+// MODO DEMONSTRAÇÃO: os perfis de exemplo usam os dois estilos (clássico e scrapbook), cada um com
+// o seu jeito (cores, capa, adesivos). Nunca sobrescreve o que já foi salvo.
 
 const withStickers = (look: ProfileAppearance, kinds: string[]) => kinds.reduce(addSticker, look);
+const scrapbook = () => chooseStyle(defaultAppearance(), "scrapbook");
 
 const DEMO_LOOKS: Record<string, () => ProfileAppearance> = {
-  "demo-mari": () => withStickers(chooseStyle(defaultAppearance(), "scrapbook"), ["fita-listrada", "coracao", "estrela", "onda", "flor"]),
-  "demo-davi": () => withStickers(chooseStyle(defaultAppearance(), "analog"), ["rec", "data"]),
-  "demo-bela": () => withStickers(chooseStyle(defaultAppearance(), "y2k"), ["brilho", "estrela-cromada", "brilhos", "coracao"]),
-  "demo-jo": () => withStickers(chooseStyle(defaultAppearance(), "glitch"), ["cursor", "coracao-pixel", "mais"]),
+  "demo-mari": () => withStickers(scrapbook(), ["fita-listrada", "coracao", "estrela", "onda", "flor"]),
+  "demo-davi": () =>
+    withStickers({ ...defaultAppearance(), palette: { primary: "#3B3127", accent: "#E07A1F", background: "#F3EEE4", decor: "#9BC1BC" } }, ["camera", "rec", "data"]),
+  "demo-bela": () =>
+    withStickers(
+      {
+        ...scrapbook(),
+        palette: { primary: "#4A2040", accent: "#E84A8A", background: "#FCEFF3", decor: "#F7C6D9" },
+        cover: { kind: "gradiente", gradient: "pessego" },
+      },
+      ["brilho", "coracao", "brilhos", "xoxo"],
+    ),
+  "demo-jo": () => withStickers({ ...defaultAppearance(), cover: { kind: "textura", texture: "pontilhado" } }, ["cursor", "coracao-pixel", "mais"]),
   "demo-rafa": () => ({
-    ...chooseStyle(defaultAppearance(), "magazine"),
+    ...defaultAppearance(),
     cover: { kind: "imagem", url: picsum("closie-capa-rafa-show", 1200, 500), x: 50, y: 40 },
   }),
-  "demo-lia": () => chooseStyle(defaultAppearance(), "minimal"),
+  "demo-lia": () => withStickers({ ...scrapbook(), palette: { primary: "#2F2A24", accent: "#5B8C5A", background: "#F6F3EA", decor: "#D9CBA3" } }, ["flor", "lua"]),
 };
 
 export function seedDemoAppearances(): number {

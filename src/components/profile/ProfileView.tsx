@@ -36,20 +36,14 @@ type ProfileViewProps = {
   className?: string;
 };
 
-const MONTHS = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
-
 // O perfil desenhado com a personalização de quem é o dono. As variáveis --p-* valem só aqui
 // dentro: nem os outros perfis nem o resto da plataforma mudam. Usa consultas de contêiner
 // (@container), então a prévia encolhida mostra exatamente o que a página mostra.
 export function ProfileView({ person, look, rel, followsYou, canSee, stats, storyCount, moments, now, actions, corner, preview, className }: ProfileViewProps) {
   const today = useMemo(() => todayStamp(now), [now]);
-  const issue = useMemo(() => {
-    const date = new Date(now);
-    return `Nº ${String(date.getMonth() + 1).padStart(2, "0")} · ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
-  }, [now]);
 
   return (
-    <div className={clsx(profileFontVariables, "@container relative isolate w-full overflow-hidden", className)} style={themeStyle(look)} data-style={look.style}>
+    <div className={clsx(profileFontVariables, "@container relative isolate w-full overflow-hidden", className)} style={themeStyle(look)}>
       <div aria-hidden className="absolute inset-0 -z-10 bg-[color:var(--p-bg)]" />
       <TextureLayer texture={look.texture} className="-z-10" />
       <div className="mx-auto w-full max-w-6xl @5xl:px-6 @5xl:pt-6">
@@ -67,8 +61,6 @@ export function ProfileView({ person, look, rel, followsYou, canSee, stats, stor
             canSee={canSee}
             stats={stats}
             storyCount={storyCount}
-            today={today}
-            issue={issue}
             actions={actions}
           />
           {rel !== "blocked" && (

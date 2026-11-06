@@ -116,7 +116,7 @@ function MyStoriesContent() {
           <div className="mt-3 rounded-3xl bg-closie-panel p-6 text-center">
             <p className="font-semibold">Você não tem stories no ar.</p>
             <p className="mt-1 text-sm text-closie-muted">O que você publica fica 24 h no seu daily.</p>
-            <Button size="sm" className="mt-4 rounded-full" onClick={openComposer}>
+            <Button size="sm" className="mt-4 rounded-full" onClick={() => openComposer("story")}>
               <Plus aria-hidden className="size-4" />
               Publicar agora
             </Button>

@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
+import { Minus, Plus, RotateCcw, RotateCw, Trash2 } from "lucide-react";
+import { createContext, useContext, useRef, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import type { Sticker } from "@/lib/appearance";
 import { STICKER_LABEL, StickerArt } from "./StickerArt";
 
@@ -21,8 +22,29 @@ export type StickerEditing = {
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   onMove: (id: string, x: number, y: number) => void;
+  onUpdate: (id: string, patch: { scale?: number; rotate?: number }) => void;
   onRemove: (id: string) => void;
 };
+
+// Escala da prévia encolhida (a personalização desenha o perfil menor): a barrinha do adesivo
+// compensa para ficar sempre do mesmo tamanho na tela.
+export const PreviewScaleContext = createContext(1);
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+function ToolbarButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="flex size-9 items-center justify-center rounded-full text-white transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white"
+    >
+      {children}
+    </button>
+  );
+}
 
 const place = (sticker: Sticker): CSSProperties => ({
   left: `${sticker.x}%`,
@@ -34,6 +56,7 @@ const place = (sticker: Sticker): CSSProperties => ({
 // atrapalham. Na prévia da personalização: arrastar move; setas também; Delete remove.
 export function StickersLayer({ stickers, today, editing }: { stickers: Sticker[]; today: Today; editing?: StickerEditing }) {
   const layerRef = useRef<HTMLDivElement>(null);
+  const previewScale = useContext(PreviewScaleContext);
 
   if (!editing) {
     return (
@@ -90,8 +113,20 @@ export function StickersLayer({ stickers, today, editing }: { stickers: Sticker[
     }
   }
 
+  const selected = stickers.find((sticker) => sticker.id === edit.selectedId) ?? null;
+  // Barrinha embaixo do adesivo (ou em cima, se ele estiver perto da borda de baixo da capa)
+  const below = selected ? selected.y < 55 : true;
+  const gap = selected ? 34 * selected.scale + 6 : 0;
+
   return (
-    <div ref={layerRef} className="absolute inset-0 z-10">
+    <div
+      ref={layerRef}
+      className="absolute inset-0 z-10"
+      onPointerDown={(event) => {
+        // Tocar na capa vazia tira a seleção
+        if (event.target === event.currentTarget) edit.onSelect(null);
+      }}
+    >
       {stickers.map((sticker) => {
         const selected = edit.selectedId === sticker.id;
         return (
@@ -112,6 +147,35 @@ export function StickersLayer({ stickers, today, editing }: { stickers: Sticker[
           </button>
         );
       })}
+      {selected && (
+        <div
+          role="toolbar"
+          aria-label={"Mexer em " + STICKER_LABEL[selected.kind]}
+          className="absolute z-20 flex gap-0.5 rounded-full bg-[#1A1A1A]/90 p-1 shadow-lg backdrop-blur-sm"
+          style={{
+            left: clamp(selected.x, 26, 74) + "%",
+            top: selected.y + "%",
+            transform: "translate(-50%, " + (below ? gap + "px" : "calc(-100% - " + gap + "px)") + ") scale(" + 1 / previewScale + ")",
+            transformOrigin: below ? "top center" : "bottom center",
+          }}
+        >
+          <ToolbarButton label="Diminuir" onClick={() => edit.onUpdate(selected.id, { scale: selected.scale - 0.15 })}>
+            <Minus aria-hidden className="size-4" />
+          </ToolbarButton>
+          <ToolbarButton label="Aumentar" onClick={() => edit.onUpdate(selected.id, { scale: selected.scale + 0.15 })}>
+            <Plus aria-hidden className="size-4" />
+          </ToolbarButton>
+          <ToolbarButton label="Girar para a esquerda" onClick={() => edit.onUpdate(selected.id, { rotate: selected.rotate - 10 })}>
+            <RotateCcw aria-hidden className="size-4" />
+          </ToolbarButton>
+          <ToolbarButton label="Girar para a direita" onClick={() => edit.onUpdate(selected.id, { rotate: selected.rotate + 10 })}>
+            <RotateCw aria-hidden className="size-4" />
+          </ToolbarButton>
+          <ToolbarButton label="Tirar adesivo" onClick={() => edit.onRemove(selected.id)}>
+            <Trash2 aria-hidden className="size-4" />
+          </ToolbarButton>
+        </div>
+      )}
     </div>
   );
 }

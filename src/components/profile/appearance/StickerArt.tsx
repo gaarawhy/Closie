@@ -1,5 +1,7 @@
-import { useId, type CSSProperties, type ReactNode } from "react";
-import type { StickerKind } from "@/lib/appearance";
+import { createElement, useId, type CSSProperties, type ReactNode } from "react";
+import { DOODLE_KINDS, RABISCO_KINDS, type DoodleKind, type RabiscoKind, type StickerKind } from "@/lib/appearance";
+import { DOODLE_LABEL, DoodleArt } from "./DoodleArt";
+import { RABISCOS } from "./rabiscos";
 
 // Biblioteca de adesivos (desenhos próprios em SVG). As cores vêm do perfil (--p-*), então
 // o mesmo adesivo combina com qualquer estilo.
@@ -14,7 +16,13 @@ const C = {
   primary: "var(--p-primary)",
 };
 
+const isDoodle = (kind: StickerKind): kind is DoodleKind => (DOODLE_KINDS as readonly string[]).includes(kind);
+const isRabisco = (kind: StickerKind): kind is RabiscoKind => (RABISCO_KINDS as readonly string[]).includes(kind);
+const RABISCO_LABEL = Object.fromEntries(RABISCO_KINDS.map((kind) => [kind, RABISCOS[kind].label])) as Record<RabiscoKind, string>;
+
 export const STICKER_LABEL: Record<StickerKind, string> = {
+  ...DOODLE_LABEL,
+  ...RABISCO_LABEL,
   brilho: "Brilho",
   estrela: "Estrela",
   coracao: "Coração",
@@ -72,7 +80,8 @@ const SIZE: Partial<Record<StickerKind, [number, number]>> = {
   "codigo-barras": [76, 34],
 };
 
-export const stickerSize = (kind: StickerKind): [number, number] => SIZE[kind] ?? [58, 58];
+export const stickerSize = (kind: StickerKind): [number, number] =>
+  isRabisco(kind) ? RABISCOS[kind].size : isDoodle(kind) ? [66, 66] : (SIZE[kind] ?? [58, 58]);
 
 // Estrela de quatro pontas (lados côncavos), centrada em cx/cy
 const sparkle = (cx: number, cy: number, r: number) =>
@@ -108,6 +117,17 @@ export function StickerArt({ kind, today, className }: { kind: StickerKind; toda
       {children}
     </svg>
   );
+  // Rabiscos à mão (dddoodle): só formas da lista fechada, na cor de destaque do perfil
+  if (isRabisco(kind)) {
+    const art = RABISCOS[kind];
+    return (
+      <svg aria-hidden width={width} height={height} viewBox={art.viewBox} className={className} style={{ overflow: "visible", color: C.accent }}>
+        {art.shapes.map((shape, index) => createElement(shape.tag, { key: index, ...shape.attrs }))}
+      </svg>
+    );
+  }
+  if (isDoodle(kind)) return <DoodleArt kind={kind} width={width} height={height} className={className} />;
+
   const ink = { stroke: C.text, strokeWidth: 2.5, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
   const doodle = { fill: "none", stroke: C.accent, strokeWidth: 3.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useNotify } from "@/components/daily/DailyShell";
+import { useComposer, useNotify } from "@/components/daily/DailyShell";
 import { followMessage } from "@/components/daily/messages";
 import { firstName } from "@/components/stories/StoriesRail";
 import { StoryViewer } from "@/components/stories/StoryViewer";
@@ -33,7 +33,6 @@ import { normalizeUsername } from "@/lib/validation";
 import { AlbumViewer } from "./AlbumViewer";
 import { ConnectionsSheet, type ConnectionsTab } from "./ConnectionsSheet";
 import { profileHref, shareLink, shareableUrl } from "./links";
-import { MomentComposer } from "./MomentComposer";
 import { ProfileCorner } from "./ProfileCorner";
 import { ProfileView } from "./ProfileView";
 
@@ -102,13 +101,13 @@ export function ProfilePage({ username }: { username?: string }) {
   const viewerId = session?.id ?? null;
   const viewerUsername = session?.profile.username ?? null;
   const notify = useNotify();
+  const openComposer = useComposer();
   const social = useSocialSnapshot();
   const now = useNow(60_000);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { viewer, open: openViewer, close: closeViewer } = useViewerState();
   const [connections, setConnections] = useState<ConnectionsTab | null>(null);
-  const [composing, setComposing] = useState(false);
   const [dialog, setDialog] = useState<null | "unfollow" | "report" | "block">(null);
   // Se o álbum foi aberto aqui (e não por um link), fechar volta no histórico
   const pushedAlbum = useRef(false);
@@ -217,7 +216,7 @@ export function ProfilePage({ username }: { username?: string }) {
             notify(`Você desbloqueou ${first}.`);
           },
           onOpenMoment: openAlbum,
-          onCreateMoment: () => setComposing(true),
+          onCreateMoment: () => openComposer("momento"),
         }}
         corner={
           <ProfileCorner
@@ -247,16 +246,6 @@ export function ProfilePage({ username }: { username?: string }) {
             notify("Momento excluído.");
           }}
           onNotify={notify}
-        />
-      )}
-      {composing && (
-        <MomentComposer
-          viewerId={me}
-          onClose={() => setComposing(false)}
-          onPublished={() => {
-            setComposing(false);
-            notify("Momento publicado!");
-          }}
         />
       )}
       {connections && (

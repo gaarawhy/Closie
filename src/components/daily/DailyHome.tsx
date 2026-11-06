@@ -107,7 +107,7 @@ export function DailyHome() {
           showFindFriends={following === 0}
           onOpenMine={() => feed.mine && openViewer([feed.mine], 0)}
           onOpenGroup={(index) => openViewer(railGroups, index)}
-          onCreate={openComposer}
+          onCreate={() => openComposer("story")}
         />
       </section>
 

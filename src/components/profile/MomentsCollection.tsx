@@ -140,27 +140,13 @@ function PolaroidItem({ post, index, now, likes, onOpen }: ItemProps) {
   );
 }
 
-// Moldura: cada foto num quadro (cromado no Y2K, neon com RGB no Glitch)
-function FrameItem({ post, now, likes, look, onOpen }: ItemProps) {
+// Moldura: cada foto num quadro
+function FrameItem({ post, now, likes, onOpen }: ItemProps) {
   const date = momentDate(post.createdAt, now);
-  const frame =
-    look.style === "glitch"
-      ? "border-2 border-[color:var(--p-primary)] p-1.5 shadow-[4px_4px_0_var(--p-accent),-3px_-3px_0_var(--p-decor)] motion-safe:group-hover:animate-[glitch-shift_280ms_steps(2)_2]"
-      : look.style === "y2k"
-        ? "rounded-[var(--p-radius)] p-[5px] shadow-lg"
-        : "rounded-[var(--p-radius)] bg-[color:var(--p-decor)] p-2 shadow-md";
   return (
     <button type="button" onClick={onOpen} aria-label={label(post, date)} className="group block w-full text-left">
-      <span
-        className={clsx("relative block", frame)}
-        style={look.style === "y2k" ? { background: "linear-gradient(135deg, #F8FAFC, #9AA5B4 35%, #FFFFFF 55%, #8D97A5 80%, #E2E8F0)" } : undefined}
-      >
-        <span
-          className={clsx(
-            "relative block aspect-[4/5] overflow-hidden bg-[color:var(--p-surface)]",
-            look.style !== "glitch" && "rounded-[calc(var(--p-radius)*0.7)]",
-          )}
-        >
+      <span className="relative block rounded-[var(--p-radius)] bg-[color:var(--p-decor)] p-2 shadow-md">
+        <span className="relative block aspect-[4/5] overflow-hidden rounded-[calc(var(--p-radius)*0.7)] bg-[color:var(--p-surface)]">
           <Cover post={post} />
           <CountBadge post={post} />
         </span>

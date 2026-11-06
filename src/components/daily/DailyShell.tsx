@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useState, type ComponentType, type ReactNode } from "react";
 import { LogoMark } from "@/components/brand/Logo";
-import { StoryComposer } from "@/components/stories/StoryComposer";
+import { CreateDialog, type CreateMode } from "@/components/create/CreateDialog";
 import { Avatar } from "@/components/ui/Avatar";
 import { Toast } from "@/components/ui/Toast";
 import { useSession } from "@/lib/account";
@@ -16,8 +16,9 @@ import { BellIcon, CreateIcon, HomeIcon, SearchIcon } from "./NavIcons";
 const NotifyContext = createContext<(message: string) => void>(() => {});
 export const useNotify = () => useContext(NotifyContext);
 
-// Abrir o "Novo story" de qualquer página (o + do menu, a bolinha "Seu daily", etc.).
-const ComposerContext = createContext<() => void>(() => {});
+// Abrir o "Criar" de qualquer página (o + do menu, a bolinha "Seu daily", o "Novo momento" do
+// perfil…), já na aba certa: story ou momento.
+const ComposerContext = createContext<(mode?: CreateMode) => void>(() => {});
 export const useComposer = () => useContext(ComposerContext);
 
 export const DAILY_PATHS = {
@@ -36,12 +37,14 @@ export const DAILY_PATHS = {
 export function DailyShell({ children }: { children: ReactNode }) {
   const session = useSession();
   const [toast, setToast] = useState<string | null>(null);
-  const [composing, setComposing] = useState(false);
+  const [creating, setCreating] = useState<CreateMode | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
-  const openComposer = useCallback(() => setComposing(true), []);
+  // Qualquer coisa que não seja "momento" (inclusive o evento de um clique) abre no story
+  const openComposer = useCallback((mode?: CreateMode) => setCreating(mode === "momento" ? "momento" : "story"), []);
+  const composing = creating !== null;
 
   // Sempre renderiza a página (o layout precisa dela, mesmo antes de a sessão chegar); o menu
-  // e o "Novo story" só aparecem com sessão. A estrutura não muda, então nada é remontado.
+  // e o "Criar" só aparecem com sessão. A estrutura não muda, então nada é remontado.
   return (
     <NotifyContext.Provider value={setToast}>
       <ComposerContext.Provider value={openComposer}>
@@ -50,14 +53,15 @@ export function DailyShell({ children }: { children: ReactNode }) {
           <main className="pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-12">{children}</main>
           {session && <BottomNav composing={composing} onCreate={openComposer} />}
         </div>
-        {session && composing && (
-          <StoryComposer
+        {session && creating && (
+          <CreateDialog
             viewerId={session.id}
             profilePrivate={session.profile.privacy === "private"}
-            onClose={() => setComposing(false)}
-            onPublished={() => {
-              setComposing(false);
-              setToast("Story publicado! Fica no ar por 24 h.");
+            initialMode={creating}
+            onClose={() => setCreating(null)}
+            onPublished={(mode) => {
+              setCreating(null);
+              setToast(mode === "story" ? "Story publicado! Fica no ar por 24 h." : "Momento publicado! Ele já está no seu perfil.");
             }}
           />
         )}
@@ -101,7 +105,7 @@ function NavLink({ href, label, icon: Icon, active, dot, tip }: { href: string; 
 
 function CreateButton({ active, onClick, tip }: { active: boolean; onClick: () => void; tip?: boolean }) {
   return (
-    <button type="button" onClick={onClick} aria-label="Criar story" className={itemClass}>
+    <button type="button" onClick={onClick} aria-label="Criar story ou momento" className={itemClass}>
       <CreateIcon active={active} className="size-[26px]" />
       {tip && <Tip>Criar</Tip>}
     </button>
@@ -173,7 +177,7 @@ function BottomNav({ composing, onCreate }: { composing: boolean; onCreate: () =
             <BarLink href={DAILY_PATHS.search} label="Pesquisar" icon={SearchIcon} active={pathname === DAILY_PATHS.search} />
           </li>
           <li className="h-full">
-            <button type="button" onClick={onCreate} aria-label="Criar story" className={clsx(barItemClass, composing && barItemActive)}>
+            <button type="button" onClick={onCreate} aria-label="Criar story ou momento" className={clsx(barItemClass, composing && barItemActive)}>
               <CreateIcon active={composing} on={composing ? "red" : "light"} className="size-6" />
               <BarLabel active={composing}>Criar</BarLabel>
             </button>

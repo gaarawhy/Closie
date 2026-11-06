@@ -19,6 +19,8 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
       ref={ref}
       aria-labelledby={titleId}
       onCancel={(event) => {
+        // O "cancel" de um seletor de arquivos aqui dentro também sobe até o <dialog>: ignorar
+        if (event.target !== event.currentTarget) return;
         event.preventDefault();
         onClose();
       }}
