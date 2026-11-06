@@ -1,0 +1,101 @@
+@import "tailwindcss";
+@config "../../tailwind.config.mts";
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-closie-bg text-closie-text font-sans antialiased;
+  }
+
+  /* Foco visível padrão: outline vermelho (continua visível no modo de alto contraste) */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-closie-red;
+  }
+
+  ::selection {
+    @apply bg-closie-red-soft text-closie-text;
+  }
+
+  /* Autopreenchimento: o Chrome pinta o fundo do campo de azul; a transição longa segura o fundo original */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    transition:
+      background-color 600000s 0s,
+      color 600000s 0s;
+  }
+
+  /* Campo de data: no Chrome, Edge e Safari o ícone nativo some e o Closie mostra o próprio botão de calendário */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+}
+
+/* O Firefox desenha o botão de calendário dele dentro do campo; lá o nosso some para não aparecer dois */
+@supports (-moz-appearance: none) {
+  .closie-date-button {
+    display: none;
+  }
+}
+
+/* Animações de entrada: só existem sem prefers-reduced-motion */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up {
+    animation: fade-up 400ms ease-out both;
+  }
+}
+
+/* Fileiras roláveis sem barra de rolagem aparente (ex.: bolinhas dos stories) */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Curtir: o coração dá um pulinho (só com movimento permitido; quem usa motion-safe: aplica) */
+@keyframes like-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Glitch: o quadro "pula" e corta em faixas ao passar o mouse (só com movimento permitido) */
+@keyframes glitch-shift {
+  0% {
+    transform: translate(0);
+    clip-path: inset(0 0 0 0);
+  }
+  33% {
+    transform: translate(-3px, 1px);
+    clip-path: inset(10% 0 55% 0);
+  }
+  66% {
+    transform: translate(3px, -1px);
+    clip-path: inset(55% 0 10% 0);
+  }
+  100% {
+    transform: translate(0);
+    clip-path: inset(0 0 0 0);
+  }
+}

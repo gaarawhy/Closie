@@ -1,0 +1,77 @@
+import type { ProfileStyle } from "./catalog";
+import type { StylePreset } from "./types";
+
+// Os estilos visuais. Cada um muda a composição inteira (capa, moldura da foto, fonte dos
+// títulos, jeito de mostrar os momentos, textura), não só as cores.
+export const STYLE_PRESETS: Record<ProfileStyle, StylePreset> = {
+  classico: {
+    name: "Clássico",
+    description: "O visual da Closie: limpo, branco e vermelho.",
+    palette: { primary: "#D62828", accent: "#D62828", background: "#FFFFFF", decor: "#F1F1EC" },
+    font: "moderna",
+    layout: "cartoes",
+    corners: "redondo",
+    frame: "anel",
+    texture: "nenhuma",
+  },
+  scrapbook: {
+    name: "Scrapbook",
+    description: "Recortes, fitas adesivas, polaroids e rabiscos.",
+    palette: { primary: "#2F2A24", accent: "#E4572E", background: "#F4ECDD", decor: "#F2C14E" },
+    font: "manuscrita",
+    layout: "colagem",
+    corners: "reto",
+    frame: "polaroid",
+    texture: "papel",
+  },
+  y2k: {
+    name: "Y2K",
+    description: "Cromado, brilhos e a internet dos anos 2000.",
+    palette: { primary: "#5B2BFF", accent: "#FF4FD8", background: "#EEEAFF", decor: "#B9C3D6" },
+    font: "retro",
+    layout: "moldura",
+    corners: "redondo",
+    frame: "cromado",
+    texture: "holografico",
+  },
+  analog: {
+    name: "Analog",
+    description: "Grão de filme, tons antigos e datas de câmera.",
+    palette: { primary: "#3B3127", accent: "#E07A1F", background: "#F3EEE4", decor: "#1F1A14" },
+    font: "editorial",
+    layout: "filme",
+    corners: "reto",
+    frame: "filme",
+    texture: "grao",
+  },
+  magazine: {
+    name: "Magazine",
+    description: "Capa de revista: títulos grandes e fotos em destaque.",
+    palette: { primary: "#111111", accent: "#E4002B", background: "#FBFAF7", decor: "#111111" },
+    font: "editorial",
+    layout: "editorial",
+    corners: "reto",
+    frame: "nenhuma",
+    texture: "nenhuma",
+  },
+  minimal: {
+    name: "Minimal",
+    description: "Só o essencial, fotos em destaque e muito respiro.",
+    palette: { primary: "#111111", accent: "#111111", background: "#FFFFFF", decor: "#E7E7E2" },
+    font: "moderna",
+    layout: "minimal",
+    corners: "suave",
+    frame: "nenhuma",
+    texture: "nenhuma",
+  },
+  glitch: {
+    name: "Glitch",
+    description: "Pixels, neon e distorção digital.",
+    palette: { primary: "#00FF9C", accent: "#FF2BD6", background: "#0B0B12", decor: "#2DE2E6" },
+    font: "retro",
+    layout: "moldura",
+    corners: "reto",
+    frame: "pixel",
+    texture: "scanlines",
+  },
+};
