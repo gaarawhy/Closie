@@ -163,11 +163,11 @@ function Stats({
   const items: { value: number; label: string; onClick?: () => void }[] = [
     {
       value: stats.posts,
-      label: stats.posts === 1 ? "momento" : "momentos",
+      label: stats.posts === 1 ? "Momento" : "Momentos",
       onClick: () => document.getElementById("momentos")?.scrollIntoView({ behavior: "smooth", block: "start" }),
     },
-    { value: stats.followers, label: stats.followers === 1 ? "seguidor" : "seguidores", onClick: canSee ? () => onOpen("followers") : undefined },
-    { value: stats.following, label: "seguindo", onClick: canSee ? () => onOpen("following") : undefined },
+    { value: stats.followers, label: stats.followers === 1 ? "Seguidor" : "Seguidores", onClick: canSee ? () => onOpen("followers") : undefined },
+    { value: stats.following, label: "Seguindo", onClick: canSee ? () => onOpen("following") : undefined },
   ];
   return (
     <div className="mt-5 flex gap-7">

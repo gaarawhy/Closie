@@ -27,6 +27,7 @@ export const DAILY_PATHS = {
   notifications: "/daily/notificacoes",
   myStories: "/daily/meus-stories",
   friends: "/daily/amigos",
+  moments: "/daily/momentos",
   profile: "/daily/perfil",
   editProfile: "/daily/perfil/editar",
   customize: "/daily/perfil/personalizar",

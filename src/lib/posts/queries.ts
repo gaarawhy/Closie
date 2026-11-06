@@ -1,3 +1,4 @@
+import { followingIds, isMuted } from "@/lib/social";
 import { canViewPosts } from "./access";
 import { loadPosts, updatePosts } from "./storage";
 import type { Post, PostFailure } from "./types";
@@ -16,6 +17,16 @@ export function listPosts(viewerId: string, ownerId: string): Post[] {
   return loadPosts()
     .posts.filter((post) => post.ownerId === ownerId)
     .sort(newestFirst);
+}
+
+// Momentos da página inicial: os seus e os de quem você segue (aprovado), só os que você pode
+// ver, sem bloqueados nem silenciados; do mais novo ao mais antigo.
+export function friendsMoments(viewerId: string, limit = 8): Post[] {
+  const owners = new Set([viewerId, ...followingIds(viewerId).filter((id) => !isMuted(viewerId, id))]);
+  return loadPosts()
+    .posts.filter((post) => owners.has(post.ownerId) && canViewPosts(viewerId, post.ownerId))
+    .sort(newestFirst)
+    .slice(0, limit);
 }
 
 // Número de publicações do perfil (um álbum conta uma vez, não importa quantas fotos).

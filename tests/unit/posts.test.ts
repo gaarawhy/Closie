@@ -119,3 +119,34 @@ describe("momentos (álbuns)", () => {
     expect(posts.listPosts("eu", "demo-nina")).toEqual([]);
   });
 });
+
+describe("momentos dos amigos (página inicial)", () => {
+  it("mostra os seus álbuns e os de quem você segue, do mais novo ao mais antigo", () => {
+    social.follow("eu", "ana", NOW);
+    social.addPerson({ id: "bia", username: "bia", displayName: "bia", avatar: null, privacy: "public" });
+    const daAna = create("ana", 2, NOW - 2 * DAY);
+    const meu = create("eu", 1, NOW - DAY);
+    create("bia", 1, NOW);
+    expect(posts.friendsMoments("eu").map((post) => post.id)).toEqual([meu.id, daAna.id]);
+  });
+
+  it("pedido pendente esconde; aprovado mostra; bloquear e silenciar escondem de novo", () => {
+    social.follow("eu", "ana", NOW);
+    social.follow("eu", "gui", NOW);
+    const daAna = create("ana", 1, NOW - DAY);
+    const doGui = create("gui", 1, NOW);
+    expect(posts.friendsMoments("eu").map((post) => post.id)).toEqual([daAna.id]);
+    social.approveFollow("gui", "eu", NOW);
+    expect(posts.friendsMoments("eu").map((post) => post.id)).toEqual([doGui.id, daAna.id]);
+    social.block("eu", "ana", NOW);
+    social.mute("eu", "gui", NOW);
+    expect(posts.friendsMoments("eu")).toEqual([]);
+  });
+
+  it("traz no máximo o limite pedido", () => {
+    social.follow("eu", "ana", NOW);
+    for (let index = 0; index < 12; index += 1) create("ana", 1, NOW - index * 60_000);
+    expect(posts.friendsMoments("eu")).toHaveLength(8);
+    expect(posts.friendsMoments("eu", 20)).toHaveLength(12);
+  });
+});

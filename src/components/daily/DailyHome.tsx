@@ -10,6 +10,7 @@ import { StoryViewer } from "@/components/stories/StoryViewer";
 import { useViewerState } from "@/components/stories/useViewerState";
 import { Button } from "@/components/ui/Button";
 import { useSession } from "@/lib/account";
+import { seedDemoPosts } from "@/lib/posts";
 import { followingIds, useSocialSnapshot } from "@/lib/social";
 import {
   followDemoFriends,
@@ -22,6 +23,7 @@ import {
 } from "@/lib/stories";
 import { DAILY_PATHS, useComposer, useNotify } from "./DailyShell";
 import { WELCOME_MESSAGE } from "./messages";
+import { MomentsCarousel } from "./MomentsCarousel";
 import { Suggestions } from "./Suggestions";
 
 // Marcada pelo onboarding (OnboardingFlow) logo antes de concluir; lida (e apagada) uma vez aqui,
@@ -31,7 +33,8 @@ export const ONBOARDING_SUCCESS_KEY = "closie:onboarding-sucesso";
 const byLatestDesc = (a: FeedGroup, b: FeedGroup) => (a.latestAt < b.latestAt ? 1 : a.latestAt > b.latestAt ? -1 : 0);
 
 // Início, no jeito da aba de histórias do Snapchat: em cima "Amigos" com as bolinhas grandes;
-// embaixo os dumps de hoje dos amigos em cartões; no fim, sugestões de quem seguir.
+// logo abaixo, o carrossel dos momentos (álbuns) dos amigos; depois os dumps de hoje em cartões;
+// no fim, sugestões de quem seguir.
 // Só amigos e sugestões: gente nova fica na Pesquisa.
 export function DailyHome() {
   // Garantida: o RouteGuard do layout só monta com sessão e onboarding concluído
@@ -56,11 +59,13 @@ export function DailyHome() {
     }
   }, [notify]);
 
-  // Modo demonstração: cria os perfis de exemplo na primeira visita e renova os stories vencidos
+  // Modo demonstração: cria os perfis de exemplo na primeira visita, renova os stories vencidos e
+  // dá álbuns aos perfis de exemplo (uma vez só), para o carrossel de momentos ter o que mostrar
   useEffect(() => {
     if (!viewerId) return;
     if (hasDemoNetwork()) refreshDemoStories();
     else seedDemoNetwork(viewerId);
+    seedDemoPosts();
   }, [viewerId]);
 
   // Bolinhas: não vistos primeiro. Cartões: atividade mais recente primeiro (assim eles não
@@ -110,6 +115,8 @@ export function DailyHome() {
           onCreate={() => openComposer("story")}
         />
       </section>
+
+      <MomentsCarousel session={session} now={now} hideEmpty={following === 0} />
 
       {!feed.loading && following === 0 && (
         <div className="mx-4 mb-2 rounded-3xl bg-closie-panel p-5 md:max-w-xl">

@@ -6,5 +6,5 @@ export { seedDemoPosts } from "./demo";
 export { groupByMonth, momentDate } from "./format";
 export { usePostsSnapshot } from "./hooks";
 export { createPost, deletePost, updatePostCaption } from "./publish";
-export { countPosts, getPost, hasLikedPost, listPosts, postLikeCount, togglePostLike } from "./queries";
+export { countPosts, friendsMoments, getPost, hasLikedPost, listPosts, postLikeCount, togglePostLike } from "./queries";
 export type { NewPhoto, Post, PostFailure, PostLike, PostPhoto } from "./types";
